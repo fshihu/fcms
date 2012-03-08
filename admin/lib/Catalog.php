@@ -59,7 +59,7 @@ class Catalog{
             }
         }
     }
-   aaaa
+
     protected function catchildadd($item,$id,$pid){
         $opt=$this->opt;
         $pclass=sprintf('%s %s_%d',$opt['p_class'],$opt['i_class'],$pid);
