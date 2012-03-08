@@ -9,11 +9,11 @@ class Catalog{
     protected $opt;
     public function  __construct($opt ){
         $this->opt=array('p_class'=>'parent',
-                                 'i_class'=>'item',
-                                 'c_class'=>'child',
-                                 'item_fn'=>function($item){ return $item['id'];}
+                         'i_class'=>'item',
+                         'c_class'=>'child',
+                         'item_fn'=>function($item){ return $item['id'];},
+                         'pid'=>0
                             );
-        //TODO 添加参数父ID？
         $this->setparm($opt);
     }
     public function setparm($opt){
@@ -25,14 +25,15 @@ class Catalog{
     }
     public function get($arr){
         $opt=$this->opt;
-        $id=$opt['id'];
+        $idstr=$opt['id_str'];
+        $pidstr=$opt['pid_str'];
         $pid=$opt['pid'];
         foreach ($arr as $valarr) {
 
-            if($valarr[$pid]==0){
-                $this->catadd($valarr,$valarr[$id]);
-            }else{
-                $this->catchildadd($valarr,$valarr[$id],$valarr[$pid]);
+            if($valarr[$idstr]==$pid ||($valarr[$pidstr]==$pid&&$pid==0) ){
+                $this->catadd($valarr,$valarr[$idstr]);
+            }else if($valarr[$idstr]>$pid){
+                $this->catchildadd($valarr,$valarr[$idstr],$valarr[$pidstr]);
             }
 
         }
@@ -48,7 +49,6 @@ class Catalog{
         $dt->setAttribute('class',sprintf('%s %s_%d',$opt['p_class'],$opt['i_class'],$id));
 
         $this->result->documentElement->appendChild($dt);
-
     }
     protected function query($tag,$class=''){
         $nodes=$this->result->getElementsByTagName($tag);
@@ -59,7 +59,7 @@ class Catalog{
             }
         }
     }
-     aaaaaa
+
     protected function catchildadd($item,$id,$pid){
         $opt=$this->opt;
         $pclass=sprintf('%s %s_%d',$opt['p_class'],$opt['i_class'],$pid);

@@ -5,6 +5,7 @@
  * Time: 下午11:41
  */
 include_once 'Table.php';
+include_once 'Manage.php';
 class Publish extends DB
 {
 
@@ -45,13 +46,27 @@ class Publish extends DB
         return true;
 
     }
+    public function del($cid,$id){
+        $manage=new Manage();
+        $r1 = $manage->query($cid);
+        $table= new Table();
+        $tablearr=$table->query('',$r1[0]['cat_tpl_id']);
 
+        $sql=sprintf('DELETE FROM `fcms`.`f_system_news` WHERE `%s`.`id` = %d',$tablearr[0]['table_name'],$id);
+        $r = $this->pdo->exec($sql);
+        $this->errorinfo = $this->pdo->errorInfo();
+        if ($r === false) {
+            return false;
+        }
+        return true;
+    }
     /**
-     * @param  int $catid 管理表ID
-     * @param   int $id
+     * @param  int $catid 管理表ID、显示数据表
+     * @param   int $id 管理表ID、显示管理表
+     * @param int $curid 具体数据表中的ID
      * @return array
      */
-    public function query($catid=-1,$id=-1)
+    public function query($catid=-1,$id=-1,$curid=-1)
     {
         if($catid===-1){
             $sql=sprintf('SELECT * FROM  `f_system_manage`  WHERE  `id` =%d  ',$id);
@@ -60,24 +75,22 @@ class Publish extends DB
             $this->errorinfo = $sth->errorInfo();
             return $r0;
         }
-        //查找表ID
-        $sql = sprintf('SELECT * FROM  `f_system_manage` WHERE  `id` =  %d LIMIT 0 , 1', $catid);
-        $sth = $this->pdo->query($sql);
-        $r1 = $sth->fetch(PDO::FETCH_ASSOC);
-        $this->errorinfo = $sth->errorInfo();
-        //查找表名
-        $sql = sprintf('SELECT * FROM  `f_system_table` WHERE  `id` =  %d LIMIT 0 , 1', $r1['cat_tpl_id']);
-        $sth = $this->pdo->query($sql);
-        $r2 = $sth->fetch(PDO::FETCH_ASSOC);
-        $this->errorinfo = $sth->errorInfo();
-        $tablename =  $r2['table_name'];
-        //没有这个表？
-        if(!$tablename){
+          //查找表ID
+        $manage=new Manage();
+        $r1 = $manage->query($catid);
+        $table= new Table();
+
+        $tablearr=$table->query('',$r1[0]['cat_tpl_id']);
+        if(empty($tablearr)){
             return array();
         }
+
+        $tablename=$tablearr[0]['table_name'];
+
+
         //查找可显示的字段
         $filed = new Filed();
-        $r3 = $filed->query($r1['cat_tpl_id']);
+        $r3 = $filed->query($r1[0]['cat_tpl_id']);
         //所有的字段
         $showfiled = 'id,';
         foreach ($r3 as $v) {
@@ -85,10 +98,17 @@ class Publish extends DB
         }
 
         $showfiled = substr($showfiled, 0, -1);
-        $sql = sprintf('SELECT %s FROM  `%s` WHERE  cat_id=%d', $showfiled, $tablename,$catid);
+        $where=sprintf(' cat_id=%d ',$catid);
+       //如果有具体的ID、显示具体数据
+        if($curid>-1){
+            $where.=sprintf(' and id=%d',$curid);
+        }
+        $sql = sprintf('SELECT %s FROM  `%s` WHERE %s ', $showfiled, $tablename,$where);
         $sth = $this->pdo->query($sql);
         $r4 = $sth->fetchAll(PDO::FETCH_ASSOC);
         $this->errorinfo = $sth->errorInfo();
+
         return $r4;
     }
+
 }

@@ -34,11 +34,12 @@
                     foreach ($filedarr as $filedval) {
                         if(in_array($filedval['filed_type'],Filed::$filetypespec)){
                             $fileddet=sprintf(Filed::$filetypedet[$filedval['filed_type']],
-                                $filedval['filed_name'],'',$filedval['filed_name']);
+                                $filedval['filed_name'],$curtablearr[0][$filedval['filed_desc']],$filedval['filed_name']);
                         }else{
                             $fileddet=sprintf(Filed::$filetypedet[$filedval['filed_type']],
-                                $filedval['filed_name'],$curtablearr[0][$filedval['filed_type']]);
+                                $filedval['filed_name'],$curtablearr[0][$filedval['filed_desc']]);
                         }
+
 
                         printf('<div class="line"><label>%s</label>%s</div>', $filedval['filed_desc'],$fileddet);
                     }

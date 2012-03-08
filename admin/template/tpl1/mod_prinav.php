@@ -32,7 +32,7 @@
             <?php
             $manage = new Manage();
             $managarr=$manage->query();
-            $navcat = new Catalog(array('id' => 'id', 'pid' => 'parent_catalog',
+            $navcat = new Catalog(array('id_str' => 'id', 'pid_str' => 'parent_catalog',
                 'item_fn'=>function($item){
                     return sprintf('<a href="editmanage.php?act=alt&amp;pid=%d">%s</a>'.
                                    '<a href="editmanage.php?act=add&amp;pid=%d">建立子目录</a>'.

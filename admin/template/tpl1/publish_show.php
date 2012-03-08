@@ -47,7 +47,7 @@
                         foreach ($val as $v) {
                             printf('<td>%s</td>',$v);
                         }
-                        printf('<td><a href="editpublish.php?act=del&id=%s">删除</a></td>',$val['id']) ;
+                        printf('<td><a href="%s&act=del&id=%s">删除</a></td>',Fun::curcul(),$val['id']) ;
                         printf('<td><a href="%s&act=alt&id=%s">修改</a></td>',Fun::curcul(),$val['id']) ;
                         echo '</tr>';
                     }

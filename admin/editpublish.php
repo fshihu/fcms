@@ -23,13 +23,17 @@ switch ($act){
                     if($val['name']){
                         $newfile=new File($val);
                         print_r($_FILES);
+                        //TODO 发布ok？等文件上传？
                     }
 
-                    //$newfile->checkfile();
                 }
 
             }
-            $publish->add($cid,$param);
+            if($publish->add($cid,$param)){
+                $actinfo='发布成功';
+            }else{
+                $actinfo=$publish->errorinfo[2];
+            }
         }
 
         include ADMIN_TPL_SRC . 'publish_add.php';
@@ -40,12 +44,22 @@ switch ($act){
         $curdirarr = $manage->query($cid);
 
         $filedarr=$filed->query($curdirarr[0]['cat_tpl_id']);
-        $curtablearr = $publish->query($cid);
-//TODO 修改、发布？显示$publish->query？？
+        $curtablearr = $publish->query($cid,-1,$_GET['id']);
+        //TODO 修改、发布？显示$publish->query？？
+
         include ADMIN_TPL_SRC . 'publish_alt.php';
         break;
     }
     case 'del':{
+        if( isset($_GET['confirm'])&&$_GET['confirm']==='yes'){
+            if($publish->del($cid,$_GET['id'])){
+                $actinfo = '删除成功';
+            }else{
+                $publish = $filed->errorinfo[2];
+            }
+
+        }
+
         include ADMIN_TPL_SRC . 'publish_del.php';
         break;
     }
